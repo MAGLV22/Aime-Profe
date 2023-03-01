@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Asistencia</title>
+  </head>
+  <body>
+    <h1 class="text-2xl">Asistencia del dia</h1>
+
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha" class="calendar" />
+    <a href="/" class="buttonn">Seleccionar</a>
+
+    <form
+      action="/{{ asistencias[0].grado if asistencias[0] else asistencias.grado }}/asistencia/{{ asistencias[0].fecha if asistencias[0] else asistencias.fecha }}"
+      method="post"
+      class="form"
+    >
+      <table class="table-auto">
+        <thead>
+          <tr>
+            <th>APELLIDO</th>
+            <th>NOMBRE</th>
+            <th>GRADO</th>
+            <th>PRESENCIA</th>
+            <th>JUSTIFICATIVO</th>
+            <th>FECHA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asistencia in asistencias %}
+          <tr>
+            <td>{{ asistencia.apellido }}</td>
+            <td>{{ asistencia.nombre }}</td>
+            <td id="grado">{{ asistencia.grado }}</td>
+            <!-- if asistencia.asistencia = 1 then the checkbox is gonna be inicially checked -->
+            <td>
+              <input class="asistencia_checkbox" name="ci" type="checkbox" value="{{
+                asistencia.asistencia }}" {% if asistencia.asistencia == 1 %}
+                checked {% endif %} onclick="changeState(this)" />
+            </td>
+            <td>{{ asistencia.justificativo }}</td>
+            <td>{{ asistencia.fecha }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <input type="hidden" name="table_data" class="table_data" value="" />
+
+      <button class="button bg-blue-600 text-white p-1 rounded-md">
+        Enviar
+      </button>
+    </form>
+
+    <!-- Script javascript -->
+  <script>
+    // changes the value of the checkbox
+    function changeState(element) {
+      // console.log(element.value);
+      // if the value is 1, then it is checked
+      if (element.value == 1) {
+        element.value = 0;
+        checked = false;
+        // if the value is 0, then it is unchecked
+      } else {
+        element.value = 1;
+        checked = true;
+      }
+    }
+
+    const button = document.querySelector(".buttonn");
+    const calendar = document.querySelector(".calendar");
+
+    button.addEventListener("click", () => {
+      fechaArray = calendar.value.split("-"); // Convertir string en array para poder modificar el orden
+      fechaArray.splice(0, 3, fechaArray[2], fechaArray[1], fechaArray[0]); // Modificar el orden del array
+
+      // parsedDateInput.setAttribute("href", fechaArray.join("-"));
+      if (button.getAttribute("href") === "/") {
+        button.setAttribute(
+          "href",
+          `/${
+            window.location.href.split("/")[3]
+          }/asistencia/${fechaArray.join("-")}`
+        );
+      } else {
+        button.setAttribute(
+          "href",
+          `/${
+            window.location.href.split("/")[3]
+          }/asistencia/${fechaArray.join("-")}`
+        );
+      }
+    });
+    
+
+    let form = document.querySelector(".form");
+    let table_data = document.querySelector(".table_data");
+    let asistencia_checkbox = document.querySelectorAll(".asistencia_checkbox"); // checkbox de asistencia con propiedad checked: true/false
+
+    let tabla_obj = {
+      all_rows: [],
+    };
+
+    form.addEventListener("submit", () => {
+      asistencia_checkbox.forEach((checkbox) => {
+        let nombre_de_alumno = checkbox.parentElement.parentElement.children[0].textContent; // Nombre que se encuentra en cada fila
+        console.log(nombre_de_alumno);
+        tabla_obj.all_rows.push([nombre_de_alumno, checkbox.checked]);
+      });
+
+      table_data.setAttribute("value", JSON.stringify(tabla_obj));
+    });
+  </script>
+</html>
+
+
+  </body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <table class="table-auto">
+      <thead>
+        <tr>
+          <th>APELLIDO</th>
+          <th>NOMBRE</th>
+          <th>ASISTENCIA</th>
+          <th>JUSTIFICATIVO</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in asistencias %}
+        <tr>
+          <td>{{ i.apellido }}</td>
+          <td>{{ i.nombre }}</td>
+          <td>{{ "Presente" if i.asistencia == 1 else "Ausente" }}</td>
+          <td>{{ i.justificativo }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <input type="date" name="calendar" class="calendar" />
+    <input type="hidden" name="parsedDate" value="" class="parsedDate" />
+    <a href="/" class="button">send</a>
+
+    <script>
+      const button = document.querySelector(".button");
+      const calendar = document.querySelector(".calendar");
+
+      button.addEventListener("click", () => {
+        fechaArray = calendar.value.split("-"); // Convertir string en array para poder modificar el orden
+        fechaArray.splice(0, 3, fechaArray[2], fechaArray[1], fechaArray[0]); // Modificar el orden del array
+
+        // parsedDateInput.setAttribute("href", fechaArray.join("-"));
+        if (button.getAttribute("href") === "/") {
+          button.setAttribute(
+            "href",
+            `/${
+              window.location.href.split("/")[3]
+            }/asistencia/${fechaArray.join("-")}`
+          );
+        } else {
+          button.setAttribute(
+            "href",
+            `/${
+              window.location.href.split("/")[3]
+            }/asistencia/${fechaArray.join("-")}`
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
